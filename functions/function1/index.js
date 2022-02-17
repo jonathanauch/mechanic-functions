@@ -1,80 +1,97 @@
 export const handler = ({ inputs, mechanic, sketch }) => {
-  const { width, height, text, color1, color2, radiusPercentage } = inputs;
+    const { width, height, text, color1, color2, radiusPercentage } = inputs;
 
-  const center = [width / 2, height / 2];
-  const radius = ((height / 2) * radiusPercentage) / 100;
-  const angle = Math.random() * Math.PI * 2;
+    const center = [width / 2, height / 2];
+    const radius = ((height / 2) * radiusPercentage) / 100;
+    const angle = Math.random() * Math.PI * 2;
+    let img;
+    let imgGraphic;
 
-  sketch.setup = () => {
-    sketch.createCanvas(width, height);
-  };
+    sketch.setup = () => {
+        sketch.createCanvas(width, height);
+    };
 
-  sketch.draw = () => {
-    sketch.background("#F4F4F4");
-    sketch.noStroke();
+    const loadImageAndAddFilter = () => {
+        imgGraphic = sketch.createGraphics(img.width, img.height);
+        imgGraphic.image(img, 0, 0);
+        imgGraphic.filter(imgGraphic.GRAY);
+        imgGraphic.blendMode(imgGraphic.MULTIPLY);
+        imgGraphic.noStroke();
+        imgGraphic.fill(color);
+        imgGraphic.rect(0, 0, img.width, img.height);
+        imgGraphic.blendMode(imgGraphic.BLEND);
+    };
 
-    sketch.translate(...center);
-    sketch.rotate(angle);
+    sketch.draw = () => {
+        sketch.background("#F4F4F4");
+        sketch.noStroke();
 
-    sketch.fill(color1);
-    sketch.arc(0, 0, 2 * radius, 2 * radius, -sketch.PI, 0);
-    sketch.fill(color2);
-    sketch.arc(0, 0, 2 * radius, 2 * radius, 0, sketch.PI);
+        sketch.translate(...center);
+        sketch.rotate(angle);
 
-    sketch.rotate(-angle);
-    sketch.fill("#000000");
-    sketch.textAlign(sketch.CENTER, sketch.BOTTOM);
-    sketch.textStyle(sketch.BOLD);
-    sketch.textSize(height / 10);
-    sketch.text(text, 0, height / 2 - height / 20);
+        sketch.fill(color1);
+        sketch.arc(0, 0, 2 * radius, 2 * radius, -sketch.PI, 0);
+        sketch.fill(color2);
+        sketch.arc(0, 0, 2 * radius, 2 * radius, 0, sketch.PI);
 
-    mechanic.done();
-  };
+        sketch.rotate(-angle);
+        sketch.fill("#000000");
+        sketch.textAlign(sketch.CENTER, sketch.BOTTOM);
+        sketch.textStyle(sketch.BOLD);
+        sketch.textSize(height / 10);
+        sketch.text(text, 0, height / 2 - height / 20);
+
+        sketch.image(imgGraphic, 0, 0, 200, 200);
+        mechanic.done();
+    };
 };
 
 export const inputs = {
-  width: {
-    type: "number",
-    default: 400,
-  },
-  height: {
-    type: "number",
-    default: 300,
-  },
-  text: {
-    type: "text",
-    default: "mechanic",
-  },
-  color1: {
-    type: "color",
-    model: "hex",
-    default: "#E94225",
-  },
-  color2: {
-    type: "color",
-    model: "hex",
-    default: "#002EBB",
-  },
-  radiusPercentage: {
-    type: "number",
-    default: 40,
-    min: 0,
-    max: 100,
-    slider: true,
-  },
+    width: {
+        type: "number",
+        default: 400,
+    },
+    height: {
+        type: "number",
+        default: 300,
+    },
+    image: {
+        type: "image",
+    },
+    text: {
+        type: "text",
+        default: "mechanic",
+    },
+    color1: {
+        type: "color",
+        model: "hex",
+        default: "#E94225",
+    },
+    color2: {
+        type: "color",
+        model: "hex",
+        default: "#002EBB",
+    },
+    radiusPercentage: {
+        type: "number",
+        default: 40,
+        min: 0,
+        max: 100,
+        slider: true,
+    },
 };
 
 export const presets = {
-  medium: {
-    width: 800,
-    height: 600,
-  },
-  large: {
-    width: 1600,
-    height: 1200,
-  },
+    medium: {
+        width: 800,
+        height: 600,
+    },
+    large: {
+        width: 1600,
+        height: 1200,
+    },
 };
 
 export const settings = {
-  engine: require("@mechanic-design/engine-p5"),
+    engine: require("@mechanic-design/engine-p5"),
 };
