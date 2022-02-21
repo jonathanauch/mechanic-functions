@@ -89,7 +89,7 @@ export const inputs = {
     },
     color1: {
         type: "color",
-        default: "#E94225",
+        default: "green",
         options: ['green', 'blue', 'red'] 
 
     },
