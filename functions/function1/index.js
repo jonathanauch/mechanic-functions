@@ -1,96 +1,102 @@
 export const handler = ({ inputs, mechanic, sketch }) => {
-    const { width, height, text, color1, color2, radiusPercentage } = inputs;
+    const {text, image, color1 } = inputs;
 
-    const center = [width / 2, height / 2];
-    const radius = ((height / 2) * radiusPercentage) / 100;
-    const angle = Math.random() * Math.PI * 2;
     let img;
     let imgGraphic;
+    let DIM = Math.min(window.innerWidth, window.innerHeight) - 30;
+    let margin = DIM/24;
+    let width = DIM;
+    let height = DIM;
+
+
+    sketch.preload = () => {
+        if (image) {
+          img = sketch.loadImage(URL.createObjectURL(image));
+        }
+      };
 
     sketch.setup = () => {
         sketch.createCanvas(width, height);
-    };
+        if (img) {
+            loadImage();
+          }    };
 
-    const loadImageAndAddFilter = () => {
+
+    const loadImage = () => {
         imgGraphic = sketch.createGraphics(img.width, img.height);
         imgGraphic.image(img, 0, 0);
-        imgGraphic.filter(imgGraphic.GRAY);
-        imgGraphic.blendMode(imgGraphic.MULTIPLY);
         imgGraphic.noStroke();
-        imgGraphic.fill(color);
-        imgGraphic.rect(0, 0, img.width, img.height);
-        imgGraphic.blendMode(imgGraphic.BLEND);
-    };
+      };
+
+      const drawRectangle = ({ rx, ry, rw, rh }) => {
+        if (img) {
+          const rectRatio = rw / rh;
+          const imageRatio = imgGraphic.width / imgGraphic.height;
+          const sw =
+            rectRatio > imageRatio
+              ? imgGraphic.width
+              : imgGraphic.height * rectRatio;
+              const sh =
+              rectRatio > imageRatio
+                ? imgGraphic.width / rectRatio
+                : imgGraphic.height;
+            const sx = (imgGraphic.width - sw) / 2;
+            const sy = (imgGraphic.height - sh) / 2;
+            sketch.image(imgGraphic, rx, ry, rw, rh, sx, sy, sw, sh);
+        } else {
+          sketch.rect(rx, ry, rw, rh);
+        }
+      };
+      
+
+  const drawRectangles = () => {
+  
+        drawRectangle({
+          rx: width/2,
+          ry: height/2,
+          rw: width/2,
+          rh: height/2,
+        });
+       
+    }
 
     sketch.draw = () => {
-        sketch.background("#F4F4F4");
+        sketch.background("gray");
         sketch.noStroke();
 
-        sketch.translate(...center);
-        sketch.rotate(angle);
-
         sketch.fill(color1);
-        sketch.arc(0, 0, 2 * radius, 2 * radius, -sketch.PI, 0);
-        sketch.fill(color2);
-        sketch.arc(0, 0, 2 * radius, 2 * radius, 0, sketch.PI);
+        sketch.rect(0, 0, width / 2, height / 2);
 
-        sketch.rotate(-angle);
         sketch.fill("#000000");
-        sketch.textAlign(sketch.CENTER, sketch.BOTTOM);
-        sketch.textStyle(sketch.BOLD);
-        sketch.textSize(height / 10);
-        sketch.text(text, 0, height / 2 - height / 20);
+        sketch.textSize(DIM / 15);
+        sketch.text(text, margin, margin + DIM/20);
 
-        sketch.image(imgGraphic, 0, 0, 200, 200);
+        drawRectangles();
+
         mechanic.done();
+
     };
 };
 
 export const inputs = {
-    width: {
-        type: "number",
-        default: 400,
-    },
-    height: {
-        type: "number",
-        default: 300,
-    },
+   
     image: {
         type: "image",
     },
     text: {
         type: "text",
-        default: "mechanic",
+        default: "follow @jonathan.auch",
     },
     color1: {
         type: "color",
-        model: "hex",
         default: "#E94225",
+        options: ['green', 'blue', 'red'] 
+
     },
-    color2: {
-        type: "color",
-        model: "hex",
-        default: "#002EBB",
-    },
-    radiusPercentage: {
-        type: "number",
-        default: 40,
-        min: 0,
-        max: 100,
-        slider: true,
-    },
+
 };
 
-export const presets = {
-    medium: {
-        width: 800,
-        height: 600,
-    },
-    large: {
-        width: 1600,
-        height: 1200,
-    },
-};
+
 
 export const settings = {
     engine: require("@mechanic-design/engine-p5"),
